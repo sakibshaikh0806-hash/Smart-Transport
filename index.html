@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Transport - Public Transport Booking Portal</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<header class="navbar">
+    <div class="logo">
+        🚆 <span>SMART<span>TRANSPORT</span></span>
+    </div>
+
+    <nav id="mainNav">
+        <a href="#home">Home</a>
+        <a href="#book">Book Now</a>
+        <a href="#dashboard">Dashboard</a>
+        <a href="#bookings">My Bookings</a>
+        <a href="#wallet">Wallet</a>
+        <a href="#contact">Contact</a>
+    </nav>
+
+    <div class="nav-buttons">
+        <button class="login-btn" onclick="openLogin()">Login</button>
+        <button class="register-btn" onclick="openRegister()">Register</button>
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    </div>
+</header>
+
+
+<!-- ================= HOME ================= -->
+
+<section id="home" class="hero">
+
+    <div class="hero-content">
+        <p class="small-title">SMART TRAVEL • ONE PLATFORM</p>
+
+        <h1>
+            Book Your Journey
+            <span>Anywhere, Anytime.</span>
+        </h1>
+
+        <p>
+            Local trains, metro, buses, express trains and domestic
+            flights — all in one smart transport booking portal.
+        </p>
+
+        <div class="hero-buttons">
+            <button onclick="scrollToBooking()" class="primary-btn">
+                🎫 Book Now
+            </button>
+
+            <button onclick="scrollToBookings()" class="secondary-btn">
+                📋 My Bookings
+            </button>
+        </div>
+    </div>
+
+    <div class="hero-card">
+        <div class="hero-card-icon">🚌</div>
+        <h3>Smart Transport</h3>
+        <p>Find the right transport for your journey.</p>
+
+        <div class="mini-route">
+            <div>
+                <small>FROM</small>
+                <strong>Mumbai</strong>
+            </div>
+
+            <div class="route-arrow">→</div>
+
+            <div>
+                <small>TO</small>
+                <strong>Thane</strong>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+<!-- ================= TRANSPORT TYPES ================= -->
+
+<section class="transport-section">
+
+    <div class="section-heading">
+        <p>EXPLORE TRANSPORT</p>
+        <h2>Choose Your Travel Mode</h2>
+        <span>Book different modes of public transportation from one place.</span>
+    </div>
+
+    <div class="transport-grid">
+
+        <div class="transport-card" onclick="selectTransport('Local Train')">
+            <div class="transport-icon">🚆</div>
+            <h3>Local Train</h3>
+            <p>Mumbai suburban railway</p>
+            <button>Book Now →</button>
+        </div>
+
+        <div class="transport-card" onclick="selectTransport('Metro')">
+            <div class="transport-icon">🚇</div>
+            <h3>Metro</h3>
+            <p>Fast city metro travel</p>
+            <button>Book Now →</button>
+        </div>
+
+        <div class="transport-card" onclick="selectTransport('Bus')">
+            <div class="transport-icon">🚌</div>
+            <h3>Public Bus</h3>
+            <p>City bus transportation</p>
+            <button>Book Now →</button>
+        </div>
+
+        <div class="transport-card" onclick="selectTransport('Express Train')">
+            <div class="transport-icon">🚄</div>
+            <h3>Express Train</h3>
+            <p>Intercity train journeys</p>
+            <button>Book Now →</button>
+        </div>
+
+        <div class="transport-card" onclick="selectTransport('Flight')">
+            <div class="transport-icon">✈️</div>
+            <h3>Domestic Flight</h3>
+            <p>Travel across India</p>
+            <button>Book Now →</button>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- ================= SMART LOCATION ================= -->
+
+<section class="location-section">
+
+    <div class="location-box">
+
+        <div>
+            <p class="small-title">SMART LOCATION</p>
+            <h2>Find Transport Near You</h2>
+            <p id="locationStatus" aria-live="polite">
+                Start live tracking to see your position on the map.
+            </p>
+        </div>
+
+        <div class="location-actions">
+            <button id="locationStartButton" type="button" onclick="getLocation()" class="location-btn">
+                📍 Start Live Tracking
+            </button>
+            <button id="locationStopButton" type="button" onclick="stopLocationTracking()" class="location-stop-btn hidden">
+                Stop Tracking
+            </button>
+        </div>
+
+    </div>
+
+    <div id="locationResult" class="location-result"></div>
+
+</section>
+
+
+<!-- ================= BOOKING ================= -->
+
+<section id="book" class="booking-section">
+
+    <div class="section-heading">
+        <p>BOOK YOUR JOURNEY</p>
+        <h2>Search Transport</h2>
+        <span>Select your transport and journey details.</span>
+    </div>
+
+    <div class="booking-container">
+
+        <!-- TRANSPORT -->
+        <div class="form-group full">
+            <label>Transport Type</label>
+
+            <div class="transport-selector">
+
+                <button type="button"
+                        class="transport-option active"
+                        data-type="Local Train"
+                        onclick="selectTransport('Local Train')">
+                    🚆 Local
+                </button>
+
+                <button type="button"
+                        class="transport-option"
+                        data-type="Metro"
+                        onclick="selectTransport('Metro')">
+                    🚇 Metro
+                </button>
+
+                <button type="button"
+                        class="transport-option"
+                        data-type="Bus"
+                        onclick="selectTransport('Bus')">
+                    🚌 Bus
+                </button>
+
+                <button type="button"
+                        class="transport-option"
+                        data-type="Express Train"
+                        onclick="selectTransport('Express Train')">
+                    🚄 Express
+                </button>
+
+                <button type="button"
+                        class="transport-option"
+                        data-type="Flight"
+                        onclick="selectTransport('Flight')">
+                    ✈️ Flight
+                </button>
+
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label>From</label>
+
+            <input
+                type="text"
+                id="source"
+                list="sourceList"
+                placeholder="Enter source"
+                autocomplete="off">
+
+            <datalist id="sourceList"></datalist>
+        </div>
+
+
+        <div class="swap-button">
+            <button onclick="swapLocations()">⇄</button>
+        </div>
+
+
+        <div class="form-group">
+            <label>To</label>
+
+            <input
+                type="text"
+                id="destination"
+                list="destinationList"
+                placeholder="Enter destination"
+                autocomplete="off">
+
+            <datalist id="destinationList"></datalist>
+        </div>
+
+
+        <div class="form-group">
+            <label>Travel Date</label>
+
+            <input
+                type="date"
+                id="travelDate">
+        </div>
+
+
+        <div class="form-group">
+            <label>Passengers</label>
+
+            <select id="passengers">
+                <option value="1">1 Passenger</option>
+                <option value="2">2 Passengers</option>
+                <option value="3">3 Passengers</option>
+                <option value="4">4 Passengers</option>
+                <option value="5">5 Passengers</option>
+                <option value="6">6 Passengers</option>
+            </select>
+        </div>
+
+
+        <div class="form-group">
+            <label>Class</label>
+
+            <select id="travelClass">
+                <option value="Standard">Standard</option>
+                <option value="Sleeper">Sleeper</option>
+                <option value="AC">AC</option>
+                <option value="Business">Business</option>
+            </select>
+        </div>
+
+
+        <div class="form-group full">
+            <button class="search-btn" onclick="searchTransport()">
+                🔎 Search Transport
+            </button>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= SEARCH RESULTS ================= -->
+
+<section id="resultsSection" class="results-section hidden">
+
+    <div class="section-heading">
+        <p>AVAILABLE SERVICES</p>
+        <h2>Choose Your Journey</h2>
+    </div>
+
+    <div id="resultsContainer"></div>
+
+</section>
+
+
+<!-- ================= DASHBOARD ================= -->
+
+<section id="dashboard" class="dashboard-section">
+
+    <div class="section-heading">
+        <p>MY ACCOUNT</p>
+        <h2>Dashboard</h2>
+    </div>
+
+    <div class="dashboard-header">
+
+        <div>
+            <p>Welcome back,</p>
+            <h2 id="dashboardName">Guest User</h2>
+        </div>
+
+        <button onclick="logout()" class="logout-btn">
+            Logout
+        </button>
+
+    </div>
+
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <span>🎫</span>
+            <p>Total Bookings</p>
+            <h2 id="totalBookings">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <span>💰</span>
+            <p>Total Spent</p>
+            <h2 id="totalSpent">₹0</h2>
+        </div>
+
+        <div class="stat-card">
+            <span>📅</span>
+            <p>Upcoming Trips</p>
+            <h2 id="upcomingTrips">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <span>👤</span>
+            <p>Account</p>
+            <h2 id="accountStatus">Guest</h2>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= BOOKINGS ================= -->
+
+<section id="bookings" class="bookings-section">
+
+    <div class="section-heading">
+        <p>TRAVEL HISTORY</p>
+        <h2>My Bookings</h2>
+    </div>
+
+    <div class="booking-filters">
+
+        <button class="filter-btn active"
+                onclick="filterBookings('all', this)">
+            All
+        </button>
+
+        <button class="filter-btn"
+                onclick="filterBookings('Upcoming', this)">
+            Upcoming
+        </button>
+
+        <button class="filter-btn"
+                onclick="filterBookings('Completed', this)">
+            Completed
+        </button>
+
+        <button class="filter-btn"
+                onclick="filterBookings('Cancelled', this)">
+            Cancelled
+        </button>
+
+    </div>
+
+    <div id="bookingList"></div>
+
+</section>
+
+
+<!-- ================= WALLET ================= -->
+
+<section id="wallet" class="wallet-section">
+
+    <div class="section-heading">
+        <p>PAYMENT</p>
+        <h2>My Wallet</h2>
+    </div>
+
+    <div class="wallet-container">
+
+        <div class="wallet-card">
+
+            <p>Available Balance</p>
+
+            <h1 id="walletBalance">₹2,000</h1>
+
+            <button onclick="openWalletModal()">
+                + Add Money
+            </button>
+
+        </div>
+
+
+        <div class="wallet-history">
+
+            <h3>Wallet Transactions</h3>
+
+            <div id="walletTransactions">
+                <p class="empty-text">No transactions yet.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= OFFERS ================= -->
+
+<section class="offers-section">
+
+    <div class="section-heading">
+        <p>SPECIAL OFFERS</p>
+        <h2>Travel More, Save More</h2>
+    </div>
+
+    <div class="offers-grid">
+
+        <div class="offer-card">
+            <span>🎁</span>
+            <h3>WELCOME100</h3>
+            <p>Get ₹100 off on your first booking.</p>
+            <button onclick="copyCoupon('WELCOME100')">
+                Copy Code
+            </button>
+        </div>
+
+        <div class="offer-card">
+            <span>🚆</span>
+            <h3>TRAIN10</h3>
+            <p>10% discount on selected train bookings.</p>
+            <button onclick="copyCoupon('TRAIN10')">
+                Copy Code
+            </button>
+        </div>
+
+        <div class="offer-card">
+            <span>✈️</span>
+            <h3>FLY500</h3>
+            <p>₹500 discount on eligible flights.</p>
+            <button onclick="copyCoupon('FLY500')">
+                Copy Code
+            </button>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= CONTACT ================= -->
+
+<section id="contact" class="contact-section">
+
+    <div class="section-heading">
+        <p>HELP CENTER</p>
+        <h2>Contact Us</h2>
+    </div>
+
+    <div class="contact-container">
+
+        <div class="contact-info">
+
+            <h2>Need Help?</h2>
+
+            <p>
+                Our support team is here to help with bookings,
+                payments and travel information.
+            </p>
+
+            <p>📧 support@smarttransport.com</p>
+            <p>📞 +91 1800 000 000</p>
+            <p>📍 Mumbai, Maharashtra, India</p>
+
+        </div>
+
+
+        <form onsubmit="submitContact(event)" class="contact-form">
+
+            <input
+                type="text"
+                id="contactName"
+                placeholder="Your Name"
+                required>
+
+            <input
+                type="email"
+                id="contactEmail"
+                placeholder="Your Email"
+                required>
+
+            <input
+                type="text"
+                id="contactSubject"
+                placeholder="Subject"
+                required>
+
+            <textarea
+                id="contactMessage"
+                placeholder="Your Message"
+                required></textarea>
+
+            <button type="submit">
+                Send Message
+            </button>
+
+        </form>
+
+    </div>
+
+</section>
+
+
+<!-- ================= LOGIN MODAL ================= -->
+
+<div id="loginModal" class="modal">
+
+    <div class="modal-content">
+
+        <button class="close-btn" onclick="closeModal('loginModal')">
+            ×
+        </button>
+
+        <div class="modal-icon">🔐</div>
+
+        <h2>Welcome Back</h2>
+        <p>Login to Smart Transport</p>
+
+        <form onsubmit="login(event)">
+
+            <input
+                type="email"
+                id="loginEmail"
+                placeholder="Email Address"
+                required>
+
+            <input
+                type="password"
+                id="loginPassword"
+                placeholder="Password"
+                required>
+
+            <button type="submit" class="modal-btn">
+                Login
+            </button>
+
+        </form>
+
+        <p class="switch-text">
+            Don't have an account?
+            <span onclick="switchToRegister()">Register</span>
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- ================= REGISTER MODAL ================= -->
+
+<div id="registerModal" class="modal">
+
+    <div class="modal-content">
+
+        <button class="close-btn" onclick="closeModal('registerModal')">
+            ×
+        </button>
+
+        <div class="modal-icon">👤</div>
+
+        <h2>Create Account</h2>
+        <p>Join Smart Transport</p>
+
+        <form onsubmit="register(event)">
+
+            <input
+                type="text"
+                id="registerName"
+                placeholder="Full Name"
+                required>
+
+            <input
+                type="email"
+                id="registerEmail"
+                placeholder="Email Address"
+                required>
+
+            <input
+                type="tel"
+                id="registerPhone"
+                placeholder="Mobile Number"
+                required>
+
+            <input
+                type="password"
+                id="registerPassword"
+                placeholder="Password"
+                required>
+
+            <input
+                type="password"
+                id="registerConfirm"
+                placeholder="Confirm Password"
+                required>
+
+            <button type="submit" class="modal-btn">
+                Create Account
+            </button>
+
+        </form>
+
+        <p class="switch-text">
+            Already have an account?
+            <span onclick="switchToLogin()">Login</span>
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- ================= PAYMENT MODAL ================= -->
+
+<div id="paymentModal" class="modal">
+
+    <div class="modal-content payment-modal">
+
+        <button class="close-btn" onclick="closeModal('paymentModal')">
+            ×
+        </button>
+
+        <h2>Complete Payment</h2>
+
+        <div id="paymentSummary"></div>
+
+        <div class="payment-tabs">
+
+            <button
+                class="payment-tab active"
+                onclick="selectPayment('wallet', this)">
+                💰 Wallet
+            </button>
+
+            <button
+                class="payment-tab"
+                onclick="selectPayment('card', this)">
+                💳 Debit Card
+            </button>
+
+            <button
+                class="payment-tab"
+                onclick="selectPayment('upi', this)">
+                📱 UPI
+            </button>
+
+        </div>
+
+
+        <!-- WALLET PAYMENT -->
+
+        <div id="walletPayment" class="payment-panel">
+
+            <div class="wallet-payment-box">
+                <p>Wallet Balance</p>
+                <h2 id="paymentWalletBalance">₹0</h2>
+            </div>
+
+            <button onclick="processPayment()" class="pay-btn">
+                Pay From Wallet
+            </button>
+
+        </div>
+
+
+        <!-- CARD PAYMENT -->
+
+        <div id="cardPayment" class="payment-panel hidden">
+
+            <input
+                type="text"
+                id="cardName"
+                placeholder="Cardholder Name">
+
+            <input
+                type="text"
+                id="cardNumber"
+                placeholder="Card Number"
+                maxlength="19">
+
+            <div class="two-inputs">
+
+                <input
+                    type="text"
+                    id="cardExpiry"
+                    placeholder="MM/YY">
+
+                <input
+                    type="password"
+                    id="cardCVV"
+                    placeholder="CVV"
+                    maxlength="3">
+
+            </div>
+
+            <button onclick="processPayment()" class="pay-btn">
+                Pay by Debit Card
+            </button>
+
+        </div>
+
+
+        <!-- UPI PAYMENT -->
+
+        <div id="upiPayment" class="payment-panel hidden">
+
+            <input
+                type="text"
+                id="upiId"
+                placeholder="example@upi">
+
+            <button onclick="processPayment()" class="pay-btn">
+                Pay by UPI
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= WALLET MODAL ================= -->
+
+<div id="walletModal" class="modal">
+
+    <div class="modal-content">
+
+        <button class="close-btn" onclick="closeModal('walletModal')">
+            ×
+        </button>
+
+        <h2>Add Money</h2>
+
+        <input
+            type="number"
+            id="addMoneyAmount"
+            placeholder="Enter amount">
+
+        <div class="quick-money">
+
+            <button onclick="setWalletAmount(500)">₹500</button>
+            <button onclick="setWalletAmount(1000)">₹1000</button>
+            <button onclick="setWalletAmount(2000)">₹2000</button>
+            <button onclick="setWalletAmount(5000)">₹5000</button>
+
+        </div>
+
+        <button onclick="addMoney()" class="modal-btn">
+            Add Money
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- ================= RECEIPT MODAL ================= -->
+
+<div id="receiptModal" class="modal">
+
+    <div class="modal-content receipt-modal">
+
+        <button class="close-btn" onclick="closeModal('receiptModal')">
+            ×
+        </button>
+
+        <div id="receiptContent"></div>
+
+        <div id="qrcode"></div>
+
+        <div class="receipt-buttons">
+
+            <button onclick="printReceipt()">
+                🖨 Print
+            </button>
+
+            <button onclick="closeModal('receiptModal')">
+                Close
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= TOAST ================= -->
+
+<div id="toast" class="toast">
+    Message
+</div>
+
+
+<footer>
+
+    <div class="footer-content">
+
+        <div>
+            <h2>🚆 SMART TRANSPORT</h2>
+            <p>
+                Your smart public transport booking platform.
+            </p>
+        </div>
+
+        <div>
+            <h3>Services</h3>
+            <p>Local Train</p>
+            <p>Metro</p>
+            <p>Bus</p>
+            <p>Express Train</p>
+            <p>Flights</p>
+        </div>
+
+        <div>
+            <h3>Support</h3>
+            <p>Help Center</p>
+            <p>Contact Us</p>
+            <p>Terms & Conditions</p>
+            <p>Privacy Policy</p>
+        </div>
+
+    </div>
+
+    <div class="copyright">
+        © 2026 Smart Transport. All Rights Reserved.
+    </div>
+
+</footer>
+
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="script.js"></script>
+
+</body>
+</html>
